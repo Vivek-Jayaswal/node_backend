@@ -7,6 +7,7 @@ const userModel = require("./models/userModel");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const mongodbSession = require("connect-mongodb-session")(session);
+const PORT = process.env.PORT || 8000
 
 const app = express();
 
@@ -111,6 +112,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.listen(8000, () => {
-  console.log("server is up and runnug");
+app.listen(PORT, () => {
+  console.log(`server is up and runnug ${PORT}`);
 });
