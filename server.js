@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require('cors');
+
 require("dotenv").config();
 
 const { userDataValidator, isEmailValidate } = require("./utils/authUtils");
@@ -7,7 +9,7 @@ const userModel = require("./models/userModel");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const mongodbSession = require("connect-mongodb-session")(session);
-const PORT = process.env.PORT || 8000
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 
@@ -25,6 +27,14 @@ mongoose
     console.log(err);
   });
 
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extends: true }));
 app.use(
@@ -38,7 +48,7 @@ app.use(
 
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
-  
+
   try {
     await userDataValidator({ name, email, password });
   } catch (error) {
@@ -76,7 +86,6 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-
   const { email, password } = req.body;
 
   if (!email || !password)
