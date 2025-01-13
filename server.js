@@ -32,6 +32,7 @@ app.use(
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
+    credentials : true
   })
 );
 
@@ -119,6 +120,33 @@ app.post("/login", async (req, res) => {
       error: error,
     });
   }
+});
+
+
+// check for user present in session or not for innovice and so many things
+app.get("/auth/check-session", (req, res) => {
+  if (req.session.isAuth) {
+    return res.status(200).json({
+      isAuthenticated: true,
+      user: req.session.user,
+    });
+  }
+  return res.status(401).json({ isAuthenticated: false });
+});
+
+// Logout Route
+app.post("/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Failed to log out",
+        error: err,
+      });
+    }
+    return res.status(200).json({
+      message: "Logged out successfully",
+    });
+  });
 });
 
 app.listen(PORT, () => {
