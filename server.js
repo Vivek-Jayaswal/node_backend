@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require('cors');
+const cors = require("cors");
 
 require("dotenv").config();
 
 const { userDataValidator, isEmailValidate } = require("./utils/authUtils");
 const userModel = require("./models/userModel");
+const todoModels = require("./models/todoModel.js");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const mongodbSession = require("connect-mongodb-session")(session);
@@ -32,7 +33,7 @@ app.use(
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
-    credentials : true
+    credentials: true,
   })
 );
 
@@ -122,7 +123,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
 // check for user present in session or not for innovice and so many things
 app.get("/auth/check-session", (req, res) => {
   if (req.session.isAuth) {
@@ -132,6 +132,56 @@ app.get("/auth/check-session", (req, res) => {
     });
   }
   return res.status(401).json({ isAuthenticated: false });
+});
+
+app.post("/invoice", async (req, res) => {
+  const { userData, companyData, transactionData } = req.body;
+  const username = req.session.user.email;
+
+  const todoObj = new todoModels({
+    userData: userData,
+    companyData: companyData,
+    transactionData: transactionData,
+    userEmail: username,
+  });
+
+  try {
+    const todoDb = await todoObj.save();
+    return res.send({
+      status: 201,
+      message: "Todo created successfully",
+      data: todoDb,
+    });
+  } catch (error) {
+    return res.send({
+      status: 500,
+      message: "Internal server error",
+      error: error,
+    });
+  }
+});
+
+app.get("/get-all-data", async (req, res) => {
+  const username = req.session.user.userEmail;
+  try {
+    const todoList = await todoModels.find({ username: username });
+    if (todoList.length === 0) {
+      return res.send({
+        status: 204,
+        message: "No Todo found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Read Success",
+      data: todoList,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error,
+    });
+  }
 });
 
 // Logout Route
