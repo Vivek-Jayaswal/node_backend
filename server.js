@@ -45,6 +45,11 @@ app.use(
     store: store,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    },
   })
 );
 
@@ -137,9 +142,8 @@ app.get("/auth/check-session", (req, res) => {
 });
 
 app.post("/invoice", async (req, res) => {
-
   console.log("invoices calling");
-  
+
   const { userData, companyData, transactionData } = req.body;
   const username = req.session.user.email;
 
@@ -168,8 +172,8 @@ app.post("/invoice", async (req, res) => {
 
 app.get("/get-all-data", async (req, res) => {
   const username = req.session.user.email;
-  console.log("username",username);
-  
+  console.log("username", username);
+
   try {
     const todoList = await todoModels.find({ userEmail: username });
     if (todoList.length === 0) {
