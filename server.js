@@ -142,7 +142,7 @@ app.post("/login", async (req, res) => {
 
 // check for user present in session or not for innovice and so many things
 app.get("/auth/check-session", (req, res) => {
-  console.log(req.session")
+  console.log(req.session)
   
   if (req.session.isAuth) {
     return res.status(200).json({
