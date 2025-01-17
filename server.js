@@ -30,7 +30,7 @@ mongoose
 
 app.use(
   cors({
-    origin: "https://vue-assesment-frontend.vercel.app/",
+    origin: "https://vue-assesment-frontend.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
