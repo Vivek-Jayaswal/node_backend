@@ -30,7 +30,7 @@ mongoose
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://vue-assesment-frontend.vercel.app/",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
@@ -114,7 +114,9 @@ app.post("/login", async (req, res) => {
       userId: userDb._id,
       email: userDb.email,
     };
-    return res.status(200).json("login successfull");
+    return res
+      .status(200)
+      .json({ message: "Login successful", isAuthenticated: true });
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
@@ -135,6 +137,9 @@ app.get("/auth/check-session", (req, res) => {
 });
 
 app.post("/invoice", async (req, res) => {
+
+  console.log("invoices calling");
+  
   const { userData, companyData, transactionData } = req.body;
   const username = req.session.user.email;
 
@@ -162,9 +167,11 @@ app.post("/invoice", async (req, res) => {
 });
 
 app.get("/get-all-data", async (req, res) => {
-  const username = req.session.user.userEmail;
+  const username = req.session.user.email;
+  console.log("username",username);
+  
   try {
-    const todoList = await todoModels.find({ username: username });
+    const todoList = await todoModels.find({ userEmail: username });
     if (todoList.length === 0) {
       return res.send({
         status: 204,
@@ -184,15 +191,20 @@ app.get("/get-all-data", async (req, res) => {
   }
 });
 
-// Logout Route
 app.post("/auth/logout", (req, res) => {
+  console.log("Logout API calling");
+
+  console.log(req.session);
+
   req.session.destroy((err) => {
     if (err) {
+      console.error("Logout error", err); // Check if any error occurs during logout
       return res.status(500).json({
         message: "Failed to log out",
         error: err,
       });
     }
+    console.log("Logout successful");
     return res.status(200).json({
       message: "Logged out successfully",
     });
