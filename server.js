@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const session = require("express-session");
 
 require("dotenv").config();
 
@@ -8,7 +9,6 @@ const { userDataValidator, isEmailValidate } = require("./utils/authUtils");
 const userModel = require("./models/userModel");
 const todoModels = require("./models/todoModel.js");
 const bcrypt = require("bcryptjs");
-const session = require("express-session");
 const mongodbSession = require("connect-mongodb-session")(session);
 const PORT = process.env.PORT || 8000;
 
@@ -28,20 +28,13 @@ mongoose
     console.log(err);
   });
 
-// app.use(
-//   cors({
-//     origin: "https://vue-assesment-frontend.vercel.app",
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//     allowedHeaders: "Content-Type,Authorization",
-//     credentials: true,
-//   })
-// );
+app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: "https://vue-assesment-frontend.vercel.app",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "http://localhost:5173",
+    methods: "GET,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
     credentials: true,
   })
 );
@@ -55,9 +48,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,
-      httpOnly: true,
-      sameSite: "None",
+      // domain: "http://localhost:5173",
+      secure: true, // Ensures the cookie is only sent over HTTPS
+      httpOnly: true, // Prevents client-side JS from accessing the cookie
+      sameSite: "None", // Controls cross-site request behavior
     },
   })
 );
@@ -125,9 +119,12 @@ app.post("/login", async (req, res) => {
 
     req.session.isAuth = true;
     req.session.user = {
-      userId: userDb._id,
-      email: userDb.email,
+      userId: userDb["_id"],
+      email: userDb["email"],
     };
+
+    console.log(req.session);
+
     return res
       .status(200)
       .json({ message: "Login successful", isAuthenticated: true });
@@ -139,9 +136,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// check for user present in session or not for innovice and so many things
 app.get("/auth/check-session", (req, res) => {
-  if (req.session.isAuth) {
+  console.log("Session Data:", req.session);
+
+  if (req.session && req.session.isAuth) {
     return res.status(200).json({
       isAuthenticated: true,
       user: req.session.user,
