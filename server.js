@@ -124,11 +124,20 @@ app.post("/login", async (req, res) => {
 
     if (!isMatched) return res.status(400).json("Incorrect password");
 
+    // req.session.isAuth = true;
+    // req.session.user = {
+    //   userId: userDb._id,
+    //   email: userDb.email,
+    // };
+
     req.session.isAuth = true;
     req.session.user = {
-      userId: userDb._id,
-      email: userDb.email,
+      userId: userDb["_id"],
+      email: userDb["email"],
     };
+
+    console.log(req.session);
+    
     return res
       .status(200)
       .json({ message: "Login successful", isAuthenticated: true });
