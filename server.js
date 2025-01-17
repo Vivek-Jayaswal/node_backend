@@ -48,6 +48,20 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extends: true }));
+// app.use(
+//   session({
+//     secret: process.env.SECRET_KEY,
+//     store: store,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: true,
+//       httpOnly: true,
+//       sameSite: "lax",
+//     },
+//   })
+// );
+
 app.use(
   session({
     secret: process.env.SECRET_KEY,
@@ -55,10 +69,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,
-      httpOnly: true,
-      sameSite: "None",
-    },
+      secure: true, // Ensures the cookie is only sent over HTTPS
+      httpOnly: true, // Prevents client-side JS from accessing the cookie
+      sameSite: "lax" // Controls cross-site request behavior
+    }
   })
 );
 
