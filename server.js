@@ -41,6 +41,8 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extends: true }));
+
+
 app.use(
   session({
     secret: process.env.SECRET_KEY,
@@ -97,6 +99,7 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  
 
   if (!email || !password)
     return res.status(400).json("Missing user credentials.");
@@ -116,7 +119,6 @@ app.post("/login", async (req, res) => {
     const isMatched = await bcrypt.compare(password, userDb.password);
 
     if (!isMatched) return res.status(400).json("Incorrect password");
-
     req.session.isAuth = true;
     req.session.user = {
       userId: userDb["_id"],
@@ -137,6 +139,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/auth/check-session", (req, res) => {
+
   console.log("Session Data:", req.session);
 
   if (req.session && req.session.isAuth) {
