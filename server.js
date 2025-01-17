@@ -28,11 +28,20 @@ mongoose
     console.log(err);
   });
 
+// app.use(
+//   cors({
+//     origin: "https://vue-assesment-frontend.vercel.app",
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     allowedHeaders: "Content-Type,Authorization",
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
     origin: "https://vue-assesment-frontend.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type,Authorization",
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
@@ -45,6 +54,11 @@ app.use(
     store: store,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: "None",
+    },
   })
 );
 
@@ -137,9 +151,8 @@ app.get("/auth/check-session", (req, res) => {
 });
 
 app.post("/invoice", async (req, res) => {
-
   console.log("invoices calling");
-  
+
   const { userData, companyData, transactionData } = req.body;
   const username = req.session.user.email;
 
@@ -168,8 +181,8 @@ app.post("/invoice", async (req, res) => {
 
 app.get("/get-all-data", async (req, res) => {
   const username = req.session.user.email;
-  console.log("username",username);
-  
+  console.log("username", username);
+
   try {
     const todoList = await todoModels.find({ userEmail: username });
     if (todoList.length === 0) {
